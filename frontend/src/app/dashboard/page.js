@@ -15,17 +15,17 @@ export default function Dashboard() {
   const router = useRouter();
 
   // Navigation Guard
-  useEffect(() => {
-  if (!user) {
-    router.push('/login');
-  }
-}, [user, router]);
+ useEffect(() => {
+  if (!user) return;
 
+  if (user.role === 'ADMIN') setActiveTab('reports');
+  else if (user.role === 'RECEPTIONIST') setActiveTab('patients');
+  else setActiveTab('appointments');
+}, [user]);
   
 
   // Global State
   const [activeTab, setActiveTab] = useState(user.role === 'ADMIN' ? 'reports' : user.role === 'RECEPTIONIST' ? 'patients' : 'appointments');
-
   // ==========================================
   // STATE FOR RECEPTIONIST WORKFLOWS
   // ==========================================
@@ -363,7 +363,7 @@ export default function Dashboard() {
       console.error(e);
     }
   };
-  if (!user) return null;
+  if (!user) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -895,7 +895,7 @@ export default function Dashboard() {
                       without optional chaining! If medicalHistory is null (which is the case for Batman, Clark Kent, etc.),
                       this code throws: "Cannot read properties of null (reading 'toUpperCase')" and crashes the app! */}
                   <p className="text-slate-700 dark:text-slate-300 leading-5 text-sm font-semibold">
-                    {selectedPatientHistory.medicalHistory.toUpperCase()}
+                    {(selectedPatientHistory.medicalHistory || 'N/A').toUpperCase()}
                   </p>
                 </div>
 
