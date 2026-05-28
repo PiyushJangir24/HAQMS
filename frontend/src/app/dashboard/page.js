@@ -16,12 +16,12 @@ export default function Dashboard() {
 
   // Navigation Guard
   useEffect(() => {
-    if (!user) {
-      router.push('/login');
-    }
-  }, [user]);
+  if (!user) {
+    router.push('/login');
+  }
+}, [user, router]);
 
-  if (!user) return null;
+  
 
   // Global State
   const [activeTab, setActiveTab] = useState(user.role === 'ADMIN' ? 'reports' : user.role === 'RECEPTIONIST' ? 'patients' : 'appointments');
@@ -363,6 +363,7 @@ export default function Dashboard() {
       console.error(e);
     }
   };
+  if (!user) return null;
 
   return (
     <div className="min-h-screen flex flex-col">
