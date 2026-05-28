@@ -13,31 +13,30 @@ router.get('/', authenticate, async (req, res) => {
   try {
     const { search, specialization } = req.query;
 
-    let query = 'SELECT * FROM "Doctor"';
-    const conditions = [];
+    const whereClause = {};
 
     if (search) {
-      // Direct string interpolation - VULNERABLE TO SQL INJECTION!
-      // Example exploit: search=House%' UNION SELECT id, email, password, name, role, '09:00', '17:00', 0, id FROM "User" --
-      conditions.push(`name ILIKE '%${search}%'`);
+      whereClause.name = {
+        contains: search,
+        mode: 'insensitive',
+      };
     }
 
     if (specialization && specialization !== 'All') {
-      conditions.push(`specialization = '${specialization}'`);
+      whereClause.specialization = specialization;
     }
 
-    if (conditions.length > 0) {
-      query += ' WHERE ' + conditions.join(' AND ');
-    }
+    const doctors = await prisma.doctor.findMany({
+      where: whereClause,
+    });
 
-    console.log(`[SQL-DEBUG] Executing Query: ${query}`);
-    const doctors = await prisma.$queryRawUnsafe(query);
-
-    // Inconsistent API formatting (directly sending array)
     res.json(doctors);
   } catch (error) {
-    // Leaks query syntax details to candidate/attacker
-    res.status(500).json({ error: 'Database execution failure', sqlMessage: error.message });
+    console.error(error);
+
+    res.status(500).json({
+      error: 'Internal server error',
+    });
   }
 });
 
