@@ -14,19 +14,24 @@ export default function Dashboard() {
   const { user, token, API_BASE_URL, logout } = useAuth();
   const router = useRouter();
 
+  if (!user) return <div>Loading...</div>;
+
   // Navigation Guard
  useEffect(() => {
   if (!user) return;
 
-  if (user.role === 'ADMIN') setActiveTab('reports');
-  else if (user.role === 'RECEPTIONIST') setActiveTab('patients');
-  else setActiveTab('appointments');
+  if (user.role === 'ADMIN') {
+    setActiveTab('reports');
+  } else if (user.role === 'RECEPTIONIST') {
+    setActiveTab('patients');
+  } else {
+    setActiveTab('appointments');
+  }
 }, [user]);
   
 
   // Global State
-  const [activeTab, setActiveTab] = useState(user.role === 'ADMIN' ? 'reports' : user.role === 'RECEPTIONIST' ? 'patients' : 'appointments');
-  // ==========================================
+  const [activeTab, setActiveTab] = useState('appointments');  // ==========================================
   // STATE FOR RECEPTIONIST WORKFLOWS
   // ==========================================
   const [patients, setPatients] = useState([]);
@@ -363,7 +368,7 @@ export default function Dashboard() {
       console.error(e);
     }
   };
-  if (!user) return <div>Loading...</div>;
+ 
 
   return (
     <div className="min-h-screen flex flex-col">
